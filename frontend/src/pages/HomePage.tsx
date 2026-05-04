@@ -14,6 +14,13 @@ export const HomePage = () => {
     fetchRecentArticles();
   }, []);
 
+  const truncateDescription = (html: string | undefined, wordCount: number = 50): string => {
+    if (!html) return '';
+    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+    const words = text.split(/\s+/).filter(word => word.length > 0);
+    return words.slice(0, wordCount).join(' ') + (words.length > wordCount ? '...' : '');
+  };
+
   const fetchRecentArticles = async () => {
     try {
       const data = await articleApi.getArticles({ status: 'published', limit: 6 });
@@ -116,6 +123,11 @@ export const HomePage = () => {
                           {featuredArticle.categoryType}
                         </span>
                       )}
+                      {featuredArticle.description && (
+                        <p className="text-gray-600 leading-relaxed mb-6">
+                          {truncateDescription(featuredArticle.description, 50)}
+                        </p>
+                      )}
                       <h2
                         className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight mb-4 group-hover:underline decoration-2 underline-offset-4"
                         style={{ fontFamily: 'Georgia, serif' }}
@@ -161,6 +173,11 @@ export const HomePage = () => {
                           {article.categoryType}
                         </span>
                       )}
+                      {article.description && (
+                        <p className="text-gray-500 text-sm leading-relaxed mb-3">
+                          {truncateDescription(article.description, 30)}
+                        </p>
+                      )}
                       <h3
                         className="text-base font-bold text-gray-900 leading-snug group-hover:underline decoration-1 underline-offset-2 mb-3 flex-1"
                         style={{ fontFamily: 'Georgia, serif' }}
@@ -189,7 +206,7 @@ export const HomePage = () => {
                 {smallArticles.map((article, i) => (
                   <Link
                     key={article.id}
-                    to={`/articles/${article.slug}`}
+                    to={`/articles/${article.slug}`} mb-2
                     className={`block group bg-white hover:bg-gray-50 transition-colors p-5 ${i === 0 ? 'border-r border-gray-900' : ''}`}
                   >
                     <div className="flex items-start gap-4">
@@ -197,6 +214,11 @@ export const HomePage = () => {
                         className="text-3xl font-black text-gray-200 leading-none"
                         style={{ fontFamily: 'Georgia, serif' }}
                       >
+                        {article.description && (
+                          <p className="text-gray-500 text-xs leading-relaxed">
+                            {truncateDescription(article.description, 20)}
+                          </p>
+                        )}
                         {String(i + 5).padStart(2, '0')}
                       </span>
                       <div>
