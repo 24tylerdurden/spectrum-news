@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 // JSONB type for PostgreSQL JSONB columns
@@ -56,12 +57,12 @@ type Article struct {
 	Slug        string     `db:"slug" json:"slug"`
 	OriginalURL *string    `db:"original_url" json:"original_url,omitempty"`
 	Topic       string     `db:"topic" json:"topic"`
-	CategoryID  *uuid.UUID `db:"category_id" json:"category_id,omitempty"`
+	CategoryID  int64 		`db:"category_id" json:"category_id,omitempty"`
 	Status      string     `db:"status" json:"status"`
 	PublishedAt *time.Time `db:"published_at" json:"published_at,omitempty"`
 	CreatedAt   time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time  `db:"updated_at" json:"updated_at"`
-	Tags        StringArray `db:"tags" json:"tags,omitempty"`
+	Tags        pq.StringArray `db:"tags" json:"tags,omitempty"`
 	Metadata    JSONB      `db:"metadata" json:"metadata,omitempty"`
 }
 
@@ -91,7 +92,7 @@ type CreateArticleRequest struct {
 	Topic       string     `json:"topic" binding:"required"`
 	CategoryID  int64     `json:"category_id"` 
 	Status      string     `json:"status"`
-	Tags        StringArray `json:"tags"`
+	Tags        pq.StringArray `json:"tags"`
 	Metadata    JSONB      `json:"metadata"`
 }
 
@@ -159,6 +160,7 @@ func CreateArticle(db *sqlx.DB, req CreateArticleRequest) (*Article, error) {
 		Status:      req.Status,
 		Tags:        req.Tags,
 		Metadata:    req.Metadata,
+		CategoryID:  req.CategoryID,
 	}
 
 	if article.Status == "" {
@@ -189,8 +191,8 @@ func GetArticleBySlug(db *sqlx.DB, slug string) (*ArticleWithPerspectives, error
 
 	// Get category if exists
 	var category *Category
-	if article.CategoryID != nil {
-		cat, err := GetCategoryByID(db, *article.CategoryID)
+	if article.CategoryID > 0 {
+		cat, err := GetCategoryByID(db, article.CategoryID)
 		if err == nil {
 			category = cat
 		}
@@ -209,9 +211,9 @@ func GetArticleBySlug(db *sqlx.DB, slug string) (*ArticleWithPerspectives, error
 	}, nil
 }
 
-func GetCategoryByID(db *sqlx.DB, id uuid.UUID) (*Category, error) {
+func GetCategoryByID(db *sqlx.DB, id int64) (*Category, error) {
 	var category Category
-	query := `SELECT id, name, slug, parent_id, created_at, updated_at 
+	query := `SELECT id, name, slug, created_at, updated_at 
 			  FROM categories WHERE id = $1`
 	err := db.Get(&category, query, id)
 	if err != nil {
