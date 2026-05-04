@@ -72,6 +72,7 @@ export const articleApi = {
     slug: string;
     original_url?: string;
     topic: string;
+    description?: string;
     category_id?: string;
     status?: string;
     tags?: string[];
@@ -85,6 +86,7 @@ export const articleApi = {
     slug?: string;
     original_url?: string;
     topic?: string;
+    description?: string;
     category_id?: string;
     status?: string;
     tags?: string[];

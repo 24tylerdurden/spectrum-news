@@ -223,6 +223,12 @@ export const ArticleDetailPage = () => {
               {article.topic}
             </h1>
 
+            {article.description && (
+              <div className="text-gray-600 leading-relaxed mb-6 prose-perspective">
+                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.description) }} />
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
               <span className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />

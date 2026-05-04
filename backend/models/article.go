@@ -66,6 +66,7 @@ type Article struct {
 	Tags        pq.StringArray `db:"tags" json:"tags,omitempty"`
 	Metadata    JSONB      `db:"metadata" json:"metadata,omitempty"`
 	Category    string 		`db:"category" json:"categoryType"`
+	Description *string    `db:"description" json:"description,omitempty"`
 }
 
 type Perspective struct {
@@ -94,6 +95,7 @@ type CreateArticleRequest struct {
 	Topic       string     `json:"topic" binding:"required"`
 	CategoryID  int64     `json:"category_id"` 
 	Status      string     `json:"status"`
+	Description *string    `json:"description"`
 	Tags        pq.StringArray `json:"tags"`
 	Metadata    JSONB      `json:"metadata"`
 }
@@ -159,6 +161,7 @@ func CreateArticle(db *sqlx.DB, req CreateArticleRequest) (*Article, error) {
 		Slug:        req.Slug,
 		OriginalURL: req.OriginalURL,
 		Topic:       req.Topic,
+		Description: req.Description,
 		Status:      req.Status,
 		Tags:        req.Tags,
 		Metadata:    req.Metadata,
@@ -169,11 +172,11 @@ func CreateArticle(db *sqlx.DB, req CreateArticleRequest) (*Article, error) {
 		article.Status = "draft"
 	}
 
-	query := `INSERT INTO articles (id, slug, original_url, topic, category_id, status, tags, metadata)
-			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING created_at, updated_at`
+	query := `INSERT INTO articles (id, slug, original_url, topic, description, category_id, status, tags, metadata)
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING created_at, updated_at`
 
 	err := db.QueryRow(query, article.ID, article.Slug, article.OriginalURL, article.Topic,
-		article.CategoryID, article.Status, article.Tags, article.Metadata).
+		article.Description, article.CategoryID, article.Status, article.Tags, article.Metadata).
 		Scan(&article.CreatedAt, &article.UpdatedAt)
 	if err != nil {
 		return nil, err
@@ -184,7 +187,7 @@ func CreateArticle(db *sqlx.DB, req CreateArticleRequest) (*Article, error) {
 
 func GetArticleBySlug(db *sqlx.DB, slug string) (*ArticleWithPerspectives, error) {
 	var article Article
-	query := `SELECT id, slug, original_url, topic, category_id, status, published_at, created_at, updated_at, tags, metadata 
+	query := `SELECT id, slug, original_url, topic, description, category_id, status, published_at, created_at, updated_at, tags, metadata 
 			  FROM articles WHERE slug = $1`
 	err := db.Get(&article, query, slug)
 	if err != nil {
@@ -229,7 +232,7 @@ func GetAllArticles(db *sqlx.DB, status string, categoryID *int64, limit, offset
 	var query string
 	var args []interface{}
 
-	baseQuery := `SELECT a.id as id, a.slug, c.name as category, a.original_url, a.topic, a.category_id, a.status, a.published_at, a.created_at, a.updated_at, a.tags, a.metadata 
+	baseQuery := `SELECT a.id as id, a.slug, c.name as category, a.original_url, a.topic, a.description, a.category_id, a.status, a.published_at, a.created_at, a.updated_at, a.tags, a.metadata
 				 FROM articles as a left join categories as c on a.category_id = c.id WHERE 1=1`
 
 	if status != "" {

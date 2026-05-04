@@ -31,6 +31,7 @@ export const ArticleEditor = () => {
   const [article, setArticle] = useState({
     topic: '',
     slug: '',
+    description: '',
     original_url: '',
     category_id: '',
     status: 'draft' as 'draft' | 'published',
@@ -68,6 +69,7 @@ export const ArticleEditor = () => {
       const data = await articleApi.getArticleBySlug(id!);
       setArticle({
         topic: data.topic,
+        description: data.description || '',
         slug: data.slug,
         original_url: data.original_url || '',
         category_id: data.category_id || '',
@@ -235,6 +237,15 @@ export const ArticleEditor = () => {
                   value={article.slug}
                   onChange={(e) => setArticle({ ...article, slug: e.target.value })}
                   placeholder="indias-economic-growth-2025"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <RichTextEditor
+                  value={article.description}
+                  onChange={(value) => setArticle({ ...article, description: value })}
+                  placeholder="Write a brief description of the article..."
                 />
               </div>
 
