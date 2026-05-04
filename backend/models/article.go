@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"fmt"
 )
 
 // JSONB type for PostgreSQL JSONB columns
@@ -64,6 +65,7 @@ type Article struct {
 	UpdatedAt   time.Time  `db:"updated_at" json:"updated_at"`
 	Tags        pq.StringArray `db:"tags" json:"tags,omitempty"`
 	Metadata    JSONB      `db:"metadata" json:"metadata,omitempty"`
+	Category    string 		`db:"category" json:"categoryType"`
 }
 
 type Perspective struct {
@@ -222,25 +224,25 @@ func GetCategoryByID(db *sqlx.DB, id int64) (*Category, error) {
 	return &category, nil
 }
 
-func GetAllArticles(db *sqlx.DB, status string, categoryID *uuid.UUID, limit, offset int) ([]Article, error) {
+func GetAllArticles(db *sqlx.DB, status string, categoryID *int64, limit, offset int) ([]Article, error) {
 	var articles []Article
 	var query string
 	var args []interface{}
 
-	baseQuery := `SELECT id, slug, original_url, topic, category_id, status, published_at, created_at, updated_at, tags, metadata 
-				 FROM articles WHERE 1=1`
+	baseQuery := `SELECT a.id as id, a.slug, c.name as category, a.original_url, a.topic, a.category_id, a.status, a.published_at, a.created_at, a.updated_at, a.tags, a.metadata 
+				 FROM articles as a left join categories as c on a.category_id = c.id WHERE 1=1`
 
 	if status != "" {
-		baseQuery += " AND status = $1"
+		baseQuery += " AND a.status = $1"
 		args = append(args, status)
 	}
 
 	if categoryID != nil {
 		if len(args) == 0 {
-			baseQuery += " AND category_id = $1"
+			baseQuery += " AND a.category_id = $1"
 			args = append(args, categoryID)
 		} else {
-			baseQuery += " AND category_id = $2"
+			baseQuery += " AND a.category_id = $2"
 			args = append(args, categoryID)
 		}
 	}
@@ -254,6 +256,8 @@ func GetAllArticles(db *sqlx.DB, status string, categoryID *uuid.UUID, limit, of
 	baseQuery += " OFFSET $"
 	baseQuery += string(rune(argCount + '0'))
 	args = append(args, offset)
+
+	fmt.Println("the query is : ", baseQuery)
 
 	query = baseQuery
 	err := db.Select(&articles, query, args...)

@@ -8,11 +8,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/24tylerdurden/indian-biased/database"
 	"github.com/24tylerdurden/indian-biased/models"
+	"fmt"
 )
 
 func GetArticles(c *gin.Context) {
 	status := c.DefaultQuery("status", "published")
-	categoryIDStr := c.Query("category_id")
+	categoryIDStr := c.DefaultQuery("category_id", "")
 	limitStr := c.DefaultQuery("limit", "20")
 	offsetStr := c.DefaultQuery("offset", "0")
 
@@ -26,13 +27,15 @@ func GetArticles(c *gin.Context) {
 		offset = 0
 	}
 
-	var categoryID *uuid.UUID
+	var categoryID *int64
 	if categoryIDStr != "" {
-		id, err := uuid.Parse(categoryIDStr)
+		id, err := strconv.ParseInt(categoryIDStr, 10, 64)
 		if err == nil {
 			categoryID = &id
 		}
 	}
+
+	fmt.Println("the catery id is : ", categoryID)
 
 	articles, err := models.GetAllArticles(database.DB, status, categoryID, limit, offset)
 	if err != nil {

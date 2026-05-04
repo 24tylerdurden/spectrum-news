@@ -35,6 +35,7 @@ export interface Article {
   updated_at: string;
   tags?: string[];
   metadata?: Record<string, any>;
+  categoryType?: string;
 }
 
 export interface ArticleWithPerspectives extends Article {
