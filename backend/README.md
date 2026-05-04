@@ -1,42 +1,71 @@
-# Biased India - Backend API
+# Biased India Backend
 
-## Setup Instructions
+Backend API for the Biased India news platform.
 
-1. **Install Dependencies**
+## Setup
+
+### Prerequisites
+- Go 1.21 or higher
+- PostgreSQL database
+- golang-migrate CLI (for manual migrations)
+
+### Installation
+
+1. Install dependencies:
 ```bash
-cd backend
 go mod download
 ```
 
-2. **Set up PostgreSQL Database**
-```bash
-# Create database
-createdb indian_biased
-
-# Run schema
-psql indian_biased < schema.sql
-```
-
-3. **Configure Environment Variables**
+2. Set up environment variables:
 ```bash
 cp .env.example .env
-# Edit .env with your actual values
 ```
 
-4. **Set up Google OAuth**
-- Go to [Google Cloud Console](https://console.cloud.google.com/)
-- Create a new project or select existing one
-- Enable Google+ API
-- Create OAuth 2.0 credentials
-- Add http://localhost:8080/api/auth/google/callback to authorized redirect URIs
-- Copy Client ID and Client Secret to .env
+Edit `.env` with your configuration:
+```
+DATABASE_URL=postgres://user:password@localhost:5432/dbname
+PORT=8080
+GIN_MODE=debug
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=24h
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:8080/api/auth/google/callback
+FRONTEND_URL=http://localhost:3000
+MIGRATIONS_PATH=./migrations
+```
 
-5. **Run the Server**
+3. Set up the database:
+```bash
+createdb indian_biased
+```
+
+4. Run migrations (automatic on startup, or manual):
+```bash
+# Automatic - migrations run when the app starts
+go run main.go
+
+# Manual - using make
+make migrate-up
+
+# Manual - using CLI
+migrate -path ./migrations -database $DATABASE_URL up
+```
+
+See [MIGRATIONS.md](./MIGRATIONS.md) for detailed migration documentation.
+
+## Running the Server
+
+### Development
 ```bash
 go run main.go
 ```
 
-The API will be available at `http://localhost:8080`
+### Production
+```bash
+go build -o main .
+./main
+```
 
 ## API Endpoints
 
@@ -49,12 +78,41 @@ The API will be available at `http://localhost:8080`
 - `POST /api/auth/logout` - Logout (requires auth)
 - `GET /api/auth/me` - Get current user (requires auth)
 
-## Database Schema
+### Articles
+- `GET /api/articles` - List articles (with optional filters)
+- `GET /api/articles/:slug` - Get article by slug with perspectives
+- `POST /api/articles` - Create article (requires auth)
+- `POST /api/articles/:id/publish` - Publish article (requires auth)
 
-The database includes:
-- `users` - User accounts
-- `oauth_accounts` - OAuth provider accounts
-- `articles` - News articles
-- `facts` - Neutral facts for articles
-- `perspectives` - Left/right perspectives for articles
-- `sessions` - Refresh token sessions
+### Perspectives
+- `POST /api/perspectives` - Create perspective (requires auth)
+
+### Categories
+- `GET /api/categories` - List categories
+
+### Health
+- `GET /health` - Health check endpoint
+
+## Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Navigate to APIs & Services → Credentials
+4. Create OAuth 2.0 Client ID credentials
+5. Add the following authorized redirect URIs:
+   - `http://localhost:8080/api/auth/google/callback`
+6. Copy Client ID and Client Secret to your `.env` file
+
+## Project Structure
+
+```
+backend/
+├── auth/              # JWT and password utilities
+├── database/          # Database connection and migrations
+├── handlers/          # API handlers
+├── middleware/        # Auth and CORS middleware
+├── models/            # Data models
+├── migrations/        # Database migration files
+├── migrate/           # Migration runner
+├── main.go            # Entry point
+└── Makefile           # Build and migration commands

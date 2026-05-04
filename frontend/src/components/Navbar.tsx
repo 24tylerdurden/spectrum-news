@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Newspaper, LogIn, UserPlus, LogOut, User, FileText } from 'lucide-react';
+import { Newspaper, LogIn, UserPlus, LogOut, User, FileText, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const Navbar = () => {
@@ -16,12 +16,20 @@ export const Navbar = () => {
 
         <div className="flex items-center space-x-4">
           {user && (
-            <Link to="/articles">
-              <Button variant="ghost" size="sm">
-                <FileText className="h-4 w-4 mr-2" />
-                Articles
-              </Button>
-            </Link>
+            <>
+              <Link to="/articles">
+                <Button variant="ghost" size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Articles
+                </Button>
+              </Link>
+              <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
+            </>
           )}
           
           {user ? (

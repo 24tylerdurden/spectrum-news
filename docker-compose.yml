@@ -10,7 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U indian_biased -d indian_biased"]
       interval: 10s
@@ -32,6 +31,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: http://localhost:8080/api/auth/google/callback
       FRONTEND_URL: http://localhost:3000
+      MIGRATIONS_PATH: /app/migrations
     ports:
       - "8080:8080"
     depends_on:

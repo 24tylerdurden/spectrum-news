@@ -28,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userData = await authApi.getMe();
         setUser(userData);
       } catch (error) {
+        console.error('Auth check failed:', error);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
       }
@@ -64,8 +65,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const googleLogin = async () => {
-    const { auth_url } = await authApi.googleLogin();
-    window.location.href = auth_url;
+    try {
+      const { auth_url } = await authApi.googleLogin();
+      window.location.href = auth_url;
+    } catch (error) {
+      console.error('Google login failed:', error);
+      throw error;
+    }
   };
 
   return (

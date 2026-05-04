@@ -18,7 +18,7 @@ RUN apk --no-cache add ca-certificates postgresql-client wget
 WORKDIR /app
 
 COPY --from=builder /app/main ./main
-COPY --from=builder /app/schema.sql ./schema.sql
+COPY --from=builder /app/migrations ./migrations
 
 RUN chmod +x ./main
 

@@ -45,18 +45,24 @@ func main() {
 		{
 			articles.GET("", handlers.GetArticles)
 			articles.GET("/:slug", handlers.GetArticleBySlug)
+			// articles.GET("/id/:id", handlers.GetArticleById)
 			articles.POST("", middleware.AuthMiddleware(), handlers.CreateArticle)
+			// articles.PUT("/:id", middleware.AuthMiddleware(), handlers.UpdateArticle)
+			// articles.DELETE("/:id", middleware.AuthMiddleware(), handlers.DeleteArticle)
 			articles.POST("/:id/publish", middleware.AuthMiddleware(), handlers.PublishArticle)
 		}
 
 		perspectives := api.Group("/perspectives")
 		{
 			perspectives.POST("", middleware.AuthMiddleware(), handlers.CreatePerspective)
+			// perspectives.PUT("/:id", middleware.AuthMiddleware(), handlers.UpdatePerspective)
+			// perspectives.DELETE("/:id", middleware.AuthMiddleware(), handlers.DeletePerspective)
 		}
 
 		categories := api.Group("/categories")
 		{
 			categories.GET("", handlers.GetCategories)
+			categories.POST("", middleware.AuthMiddleware(), handlers.CreateCategory)
 		}
 	}
 

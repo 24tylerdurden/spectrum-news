@@ -42,6 +42,10 @@ export interface ArticleWithPerspectives extends Article {
   perspectives: Perspective[];
 }
 
+interface CategoriesApiResponse {
+  categories: Category[];
+}
+
 export const articleApi = {
   getArticles: async (params?: {
     status?: string;
@@ -58,6 +62,11 @@ export const articleApi = {
     return response.data;
   },
 
+  getArticleById: async (id: string) => {
+    const response = await api.get<ArticleWithPerspectives>(`/articles/id/${id}`);
+    return response.data;
+  },
+
   createArticle: async (data: {
     slug: string;
     original_url?: string;
@@ -69,6 +78,23 @@ export const articleApi = {
   }) => {
     const response = await api.post<Article>('/articles', data);
     return response.data;
+  },
+
+  updateArticle: async (id: string, data: {
+    slug?: string;
+    original_url?: string;
+    topic?: string;
+    category_id?: string;
+    status?: string;
+    tags?: string[];
+    metadata?: Record<string, any>;
+  }) => {
+    const response = await api.put<Article>(`/articles/${id}`, data);
+    return response.data;
+  },
+
+  deleteArticle: async (id: string) => {
+    await api.delete(`/articles/${id}`);
   },
 
   publishArticle: async (id: string) => {
@@ -92,7 +118,7 @@ export const articleApi = {
   },
 
   getCategories: async () => {
-    const response = await api.get<Category[]>('/categories');
-    return response.data;
+    const response = await api.get<CategoriesApiResponse>('/categories');
+    return response.data.categories;
   },
 };

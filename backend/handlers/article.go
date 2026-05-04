@@ -90,11 +90,43 @@ func CreatePerspective(c *gin.Context) {
 func GetCategories(c *gin.Context) {
 	categories, err := models.GetAllCategories(database.DB)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, categories)
+	c.JSON(http.StatusOK, gin.H{
+		"categories": categories,
+	})
+}
+
+func CreateCategory(c *gin.Context) {
+	var req struct {
+		Name     string `json:"name" binding:"required"`
+		Slug     string `json:"slug" binding:"required"`
+		ParentID string `json:"parent_id"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var parentID *uuid.UUID
+	if req.ParentID != "" {
+		id, err := uuid.Parse(req.ParentID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid parent ID"})
+			return
+		}
+		parentID = &id
+	}
+
+	category, err := models.CreateCategory(database.DB, req.Name, req.Slug, parentID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, category)
 }
 
 func PublishArticle(c *gin.Context) {

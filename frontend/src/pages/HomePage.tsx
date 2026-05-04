@@ -74,7 +74,7 @@ export const HomePage = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading articles...</p>
             </div>
-          ) : recentArticles.length === 0 ? (
+          ) : recentArticles && recentArticles.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Newspaper className="h-12 w-12 text-muted-foreground mb-4" />
@@ -83,7 +83,7 @@ export const HomePage = () => {
             </Card>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
-              {recentArticles.map((article) => (
+              {recentArticles && recentArticles.map((article) => (
                 <Link key={article.id} to={`/articles/${article.slug}`}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                     <CardHeader>

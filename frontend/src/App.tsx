@@ -7,6 +7,8 @@ import { SignupPage } from '@/pages/SignupPage';
 import { OAuthCallback } from '@/pages/OAuthCallback';
 import { ArticlesPage } from '@/pages/ArticlesPage';
 import { ArticleDetailPage } from '@/pages/ArticleDetailPage';
+import { AdminPortal } from '@/pages/AdminPortal';
+import { ArticleEditor } from '@/pages/ArticleEditor';
 
 function App() {
   return (
@@ -26,6 +28,9 @@ function App() {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/articles" element={<ArticlesPage />} />
                     <Route path="/articles/:slug" element={<ArticleDetailPage />} />
+                    <Route path="/admin" element={<AdminPortal />} />
+                    <Route path="/admin/articles/new" element={<ArticleEditor />} />
+                    <Route path="/admin/articles/:id/edit" element={<ArticleEditor />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </>

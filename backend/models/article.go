@@ -43,7 +43,7 @@ func (s *StringArray) Scan(value interface{}) error {
 }
 
 type Category struct {
-	ID        uuid.UUID  `db:"id" json:"id"`
+	ID        int64 `db:"id" json:"id"`
 	Name      string     `db:"name" json:"name"`
 	Slug      string     `db:"slug" json:"slug"`
 	ParentID  *uuid.UUID `db:"parent_id" json:"parent_id,omitempty"`
@@ -89,7 +89,7 @@ type CreateArticleRequest struct {
 	Slug        string     `json:"slug" binding:"required"`
 	OriginalURL *string    `json:"original_url"`
 	Topic       string     `json:"topic" binding:"required"`
-	CategoryID  *uuid.UUID `json:"category_id"`
+	CategoryID  int64     `json:"category_id"` 
 	Status      string     `json:"status"`
 	Tags        StringArray `json:"tags"`
 	Metadata    JSONB      `json:"metadata"`
@@ -110,7 +110,6 @@ type CreatePerspectiveRequest struct {
 // Category functions
 func CreateCategory(db *sqlx.DB, name, slug string, parentID *uuid.UUID) (*Category, error) {
 	category := &Category{
-		ID:       uuid.New(),
 		Name:     name,
 		Slug:     slug,
 		ParentID: parentID,
@@ -130,7 +129,7 @@ func CreateCategory(db *sqlx.DB, name, slug string, parentID *uuid.UUID) (*Categ
 
 func GetCategoryBySlug(db *sqlx.DB, slug string) (*Category, error) {
 	var category Category
-	query := `SELECT id, name, slug, parent_id, created_at, updated_at 
+	query := `SELECT id, name, slug, created_at, updated_at 
 			  FROM categories WHERE slug = $1`
 	err := db.Get(&category, query, slug)
 	if err != nil {
@@ -141,7 +140,7 @@ func GetCategoryBySlug(db *sqlx.DB, slug string) (*Category, error) {
 
 func GetAllCategories(db *sqlx.DB) ([]Category, error) {
 	var categories []Category
-	query := `SELECT id, name, slug, parent_id, created_at, updated_at 
+	query := `SELECT id, name, slug, created_at, updated_at 
 			  FROM categories ORDER BY name`
 	err := db.Select(&categories, query)
 	if err != nil {
@@ -157,7 +156,6 @@ func CreateArticle(db *sqlx.DB, req CreateArticleRequest) (*Article, error) {
 		Slug:        req.Slug,
 		OriginalURL: req.OriginalURL,
 		Topic:       req.Topic,
-		CategoryID:  req.CategoryID,
 		Status:      req.Status,
 		Tags:        req.Tags,
 		Metadata:    req.Metadata,
@@ -167,10 +165,10 @@ func CreateArticle(db *sqlx.DB, req CreateArticleRequest) (*Article, error) {
 		article.Status = "draft"
 	}
 
-	query := `INSERT INTO articles (id, slug, original_url, topic, category_id, status, tags, metadata) 
+	query := `INSERT INTO articles (id, slug, original_url, topic, category_id, status, tags, metadata)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING created_at, updated_at`
 
-	err := db.QueryRow(query, article.ID, article.Slug, article.OriginalURL, article.Topic, 
+	err := db.QueryRow(query, article.ID, article.Slug, article.OriginalURL, article.Topic,
 		article.CategoryID, article.Status, article.Tags, article.Metadata).
 		Scan(&article.CreatedAt, &article.UpdatedAt)
 	if err != nil {
@@ -267,6 +265,28 @@ func PublishArticle(db *sqlx.DB, id uuid.UUID) error {
 	now := time.Now()
 	query := `UPDATE articles SET status = 'published', published_at = $1 WHERE id = $2`
 	_, err := db.Exec(query, now, id)
+	return err
+}
+
+func DeleteArticle(db *sqlx.DB, id string) error {
+	query := `DELETE FROM articles WHERE id = $1`
+	_, err := db.Exec(query, id)
+	return err
+}
+
+func UpdatePerspective(db *sqlx.DB, perspective *Perspective) error {
+	query := `
+		UPDATE perspectives
+		SET lean = $1, lean_score = $2, headline = $3, summary = $4, body = $5, source_name = $6, source_url = $7, sentiment = $8
+		WHERE id = $9
+	`
+	_, err := db.Exec(query, perspective.Lean, perspective.LeanScore, perspective.Headline, perspective.Summary, perspective.Body, perspective.SourceName, perspective.SourceURL, perspective.Sentiment, perspective.ID)
+	return err
+}
+
+func DeletePerspective(db *sqlx.DB, id string) error {
+	query := `DELETE FROM perspectives WHERE id = $1`
+	_, err := db.Exec(query, id)
 	return err
 }
 
