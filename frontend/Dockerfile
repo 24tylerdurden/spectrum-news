@@ -1,4 +1,5 @@
 FROM node:20-slim AS builder
+ARG VITE_API_URL
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
