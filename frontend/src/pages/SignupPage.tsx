@@ -57,7 +57,7 @@ export const SignupPage = () => {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>
-            Sign up to get started with Biased India
+            Sign up to get started with Spectrum News
           </CardDescription>
         </CardHeader>
         <CardContent>

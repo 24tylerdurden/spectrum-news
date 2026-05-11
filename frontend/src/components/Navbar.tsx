@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Newspaper, LogIn, UserPlus, LogOut, User, FileText, Settings } from 'lucide-react';
+import { LogIn, UserPlus, LogOut, User, FileText, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import SpectrumIcon from '@/components/SpectrumIcon';
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -10,8 +11,8 @@ export const Navbar = () => {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <Newspaper className="h-6 w-6" />
-          <span className="font-bold text-xl">Biased India</span>
+          <SpectrumIcon size={32} />
+          <span className="font-bold text-xl">Spectrum News</span>
         </Link>
 
         <div className="flex items-center space-x-4">

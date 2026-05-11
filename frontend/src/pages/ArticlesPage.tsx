@@ -188,7 +188,7 @@ export const ArticlesPage = () => {
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
               <p className="text-[9px] tracking-[0.4em] uppercase font-bold text-gray-400 mb-2">
-                Biased India
+                Spectrum News
               </p>
               <h1
                 className="text-4xl sm:text-5xl font-black text-gray-900 leading-none"

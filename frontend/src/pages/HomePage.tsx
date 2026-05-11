@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { articleApi, type Article } from '@/lib/api-articles';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArrowRight, Clock, TrendingUp, Eye, Shield } from 'lucide-react';
+import SpectrumIcon from '@/components/SpectrumIcon';
 
 export const HomePage = () => {
   const { user } = useAuth();
@@ -42,7 +43,7 @@ export const HomePage = () => {
 
       <header className="border-b border-gray-900 bg-[#f8f7f2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between py-2 border-b border-gray-200 text-xs text-gray-500">
+          {/* <div className="flex items-center justify-between py-2 border-b border-gray-200 text-xs text-gray-500">
             <span>{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
             <div className="flex items-center gap-4">
               {!user ? (
@@ -58,9 +59,12 @@ export const HomePage = () => {
                 <Link to="/articles" className="hover:text-gray-900 transition-colors">My Feed</Link>
               )}
             </div>
-          </div>
+          </div> */}
 
           <div className="py-5 text-center">
+            <div className="flex justify-center mb-3">
+              <SpectrumIcon size={48} />
+            </div>
             <div className="inline-flex items-center gap-3 mb-1">
               <div className="h-px w-16 bg-gray-900" />
               <span className="text-[10px] tracking-[0.35em] uppercase font-medium text-gray-500">Est. 2026</span>
@@ -70,7 +74,7 @@ export const HomePage = () => {
               className="text-5xl sm:text-7xl font-black tracking-tight text-gray-900 leading-none"
               style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
             >
-              Biased India
+              Spectrum News
             </h1>
             <p className="mt-2 text-xs tracking-[0.25em] uppercase text-gray-500 font-medium">
               Every story. Every angle. You decide.
@@ -268,7 +272,7 @@ export const HomePage = () => {
 
         <div className="flex items-center gap-4 my-14">
           <div className="flex-1 h-px bg-gray-300" />
-          <span className="text-[10px] tracking-[0.35em] uppercase font-bold text-gray-400">Why Biased India</span>
+          <span className="text-[10px] tracking-[0.35em] uppercase font-bold text-gray-400">Why Spectrum News</span>
           <div className="flex-1 h-px bg-gray-300" />
         </div>
 
@@ -340,7 +344,7 @@ export const HomePage = () => {
       </main>
 
       <footer className="border-t border-gray-300 mt-16 py-8 text-center text-xs text-gray-400">
-        <p className="tracking-wider">© {new Date().getFullYear()} Biased India — All perspectives, all the time.</p>
+        <p className="tracking-wider">© {new Date().getFullYear()} Spectrum News — All perspectives, all the time.</p>
       </footer>
     </div>
   );
